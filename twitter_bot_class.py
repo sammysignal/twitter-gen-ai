@@ -65,6 +65,7 @@ class TwitterDriver:
         self.getHome()
 
         # check if cookies are pickled, and if so adds them to browser
+        cookies = None
         try:
             cookies = pickle.load(open("cookies.pkl", "rb"))
             if cookies:
@@ -72,7 +73,10 @@ class TwitterDriver:
                 for cookie in cookies:
                     driver.add_cookie(cookie)
                 time.sleep(2)
-        except EOFError:
+            else:
+                print("Could not read cookies.")
+        except EOFError as e:
+            print(e)
             cookies = None
 
         self.getHome()
@@ -82,6 +86,7 @@ class TwitterDriver:
             return
         else:
             # Log in
+            print("Logging in with username and pass...")
             try:
                 email = driver.find_element(By.CSS_SELECTOR, "[autocomplete='username']")
             except common.exceptions.NoSuchElementException:
@@ -92,6 +97,7 @@ class TwitterDriver:
             email.send_keys(self.email)
             time.sleep(1)
             email.send_keys(Keys.RETURN)
+            print("Waiting for password screen...")
             time.sleep(10)
 
             try:
@@ -100,7 +106,9 @@ class TwitterDriver:
                 time.sleep(10)
                 password = driver.find_element(By.CSS_SELECTOR, "[name='password']")
 
+            print("Entering password...")
             password.send_keys(self.password)
+            time.sleep(1)
             password.send_keys(Keys.RETURN)
 
             time.sleep(20)
@@ -110,6 +118,8 @@ class TwitterDriver:
 
         if not self.is_logged_in:
             raise Exception("Error logging in")
+        else:
+            print("Logged in successfully")
 
     # Attempts to get to homepage, and if successful saves cookies. Updates is_logged_in flag.
     def getHome(self):
@@ -118,6 +128,7 @@ class TwitterDriver:
         if "twitter.com/home" in self.driver.current_url:
             self.is_logged_in = True
             pickle.dump(self.driver.get_cookies(), open("cookies.pkl","wb"))
+            print("Updated cookie pickle file.")
             return
         self.is_logged_in = False
 
@@ -126,6 +137,7 @@ class TwitterDriver:
         if not self.is_logged_in:
             raise Exception("You must log in first!")
 
+        print("Posting tweet...")
         driver = self.driver
 
         try:
@@ -133,8 +145,9 @@ class TwitterDriver:
         except common.exceptions.NoSuchElementException:
             time.sleep(5)
             driver.find_element(By.XPATH, "//a[@data-testid='SideNav_NewTweet_Button']").click()
-
+        print("Opened tweet modal")
         time.sleep(5)
+        print("Inputting tweet...")
 
         try:
             driver.find_element(By.XPATH, "//div[@role='textbox']").send_keys(tweetBody)
@@ -146,6 +159,7 @@ class TwitterDriver:
         driver.find_element(By.CLASS_NAME, "notranslate").send_keys(Keys.ENTER)
         time.sleep(4)
         # driver.find_element(By.XPATH,"//div[@data-testid='tweetButton']").click()
+        print("Tweeted!")
         time.sleep(10)
     
     def quit(self):

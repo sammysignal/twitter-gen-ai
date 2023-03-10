@@ -22,12 +22,12 @@ def postTweetLoop():
             tweetBody = getTweet()
             pj = TwitterDriver(U, P)
             pj.login()
-            print("Logged in successfully")
             pj.post_tweet(tweetBody)
-            print("Tweeting: " + tweetBody)
+            print("Tweeted: " + tweetBody)
             pj.quit()
         except EOFError as e:
             print(e)
+        print("Sleeping...")  
         time.sleep(SLEEP_TIME)
         
 

@@ -2,6 +2,7 @@
 pw.py
 cookies.pkl
 requests.sh
+pierre.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
