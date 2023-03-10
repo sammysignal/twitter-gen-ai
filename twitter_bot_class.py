@@ -2,7 +2,8 @@ from selenium import webdriver
 from selenium import common
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-import time, pickle
+import time, pickle, logging
+logging.basicConfig(filename='pierre.log', encoding='utf-8', level=logging.DEBUG)
 
 from get_driver import GetDriver
 
@@ -61,7 +62,7 @@ class TwitterDriver:
     # Logs in and redirects to homepage
     def login(self):
         driver = self.driver
-        
+
         self.getHome()
 
         # check if cookies are pickled, and if so adds them to browser
@@ -69,14 +70,14 @@ class TwitterDriver:
         try:
             cookies = pickle.load(open("cookies.pkl", "rb"))
             if cookies:
-                print("Found " + str(len(cookies)) + " cookies, applying to browser")
+                logging.info("Found " + str(len(cookies)) + " cookies, applying to browser")
                 for cookie in cookies:
                     driver.add_cookie(cookie)
                 time.sleep(2)
             else:
-                print("Could not read cookies.")
+                logging.info("Could not read cookies.")
         except EOFError as e:
-            print(e)
+            logging.error(e)
             cookies = None
 
         self.getHome()
@@ -86,7 +87,7 @@ class TwitterDriver:
             return
         else:
             # Log in
-            print("Logging in with username and pass...")
+            logging.info("Logging in with username and pass...")
             try:
                 email = driver.find_element(By.CSS_SELECTOR, "[autocomplete='username']")
             except common.exceptions.NoSuchElementException:
@@ -97,7 +98,7 @@ class TwitterDriver:
             email.send_keys(self.email)
             time.sleep(1)
             email.send_keys(Keys.RETURN)
-            print("Waiting for password screen...")
+            logging.info("Waiting for password screen...")
             time.sleep(10)
 
             try:
@@ -106,7 +107,7 @@ class TwitterDriver:
                 time.sleep(10)
                 password = driver.find_element(By.CSS_SELECTOR, "[name='password']")
 
-            print("Entering password...")
+            logging.info("Entering password...")
             password.send_keys(self.password)
             time.sleep(1)
             password.send_keys(Keys.RETURN)
@@ -119,7 +120,7 @@ class TwitterDriver:
         if not self.is_logged_in:
             raise Exception("Error logging in")
         else:
-            print("Logged in successfully")
+            logging.info("Logged in successfully")
 
     # Attempts to get to homepage, and if successful saves cookies. Updates is_logged_in flag.
     def getHome(self):
@@ -128,7 +129,7 @@ class TwitterDriver:
         if "twitter.com/home" in self.driver.current_url:
             self.is_logged_in = True
             pickle.dump(self.driver.get_cookies(), open("cookies.pkl","wb"))
-            print("Updated cookie pickle file.")
+            logging.info("Updated cookie pickle file.")
             return
         self.is_logged_in = False
 
@@ -137,7 +138,7 @@ class TwitterDriver:
         if not self.is_logged_in:
             raise Exception("You must log in first!")
 
-        print("Posting tweet...")
+        logging.info("Posting tweet...")
         driver = self.driver
 
         try:
@@ -145,9 +146,9 @@ class TwitterDriver:
         except common.exceptions.NoSuchElementException:
             time.sleep(5)
             driver.find_element(By.XPATH, "//a[@data-testid='SideNav_NewTweet_Button']").click()
-        print("Opened tweet modal")
+        logging.info("Opened tweet modal")
         time.sleep(5)
-        print("Inputting tweet...")
+        logging.info("Inputting tweet...")
 
         try:
             driver.find_element(By.XPATH, "//div[@role='textbox']").send_keys(tweetBody)
@@ -159,17 +160,17 @@ class TwitterDriver:
         driver.find_element(By.CLASS_NAME, "notranslate").send_keys(Keys.ENTER)
         time.sleep(4)
         # driver.find_element(By.XPATH,"//div[@data-testid='tweetButton']").click()
-        print("Tweeted!")
+        logging.info("Tweeted!")
         time.sleep(10)
-    
+
     def quit(self):
         return self.driver.quit()
 
 
     ############################################
     ### Other maybe useful methods, untested ###
-    ############################################ 
-        
+    ############################################
+
     def logout(self):
         if not self.is_logged_in:
             return
