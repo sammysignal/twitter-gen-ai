@@ -9,6 +9,10 @@ from pw import U, P
 # 6 hours
 SLEEP_TIME = 21600
 
+# Options
+HEADLESS = True
+OVERRIDE = False
+
 def getTweet():
     return "test"
 
@@ -29,7 +33,7 @@ def cannotTweet():
     return False
 
 # Post a tweet then
-def postTweetLoop(override=False):
+def postTweetLoop(override=False, headless=True):
     # Sleep to allow ChromeDriver ports to set up or smtg....
     time.sleep(20)
     
@@ -42,7 +46,7 @@ def postTweetLoop(override=False):
             p_logger.info("######################")
             p_logger.info("Attempting to tweet...")
             tweetBody = getTweet()
-            pj = TwitterDriver(U, P, headless=True)
+            pj = TwitterDriver(U, P, headless=headless)
             pj.login()
             pj.post_tweet(tweetBody)
             p_logger.info("Tweeted: " + tweetBody)
@@ -64,5 +68,5 @@ def postTweetLoop(override=False):
 
 
 if __name__ == "__main__":
-    exit(postTweetLoop(override=False))
+    exit(postTweetLoop(override=OVERRIDE, headless=HEADLESS))
     

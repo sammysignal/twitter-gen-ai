@@ -21,8 +21,8 @@ class GetDriver:
         driver = None
         if headless:
             options = webdriver.ChromeOptions();
-            options.addArguments('--headless')
-            driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
+            options.add_argument('--headless')
+            driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', chrome_options=options)
         else:
             driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
 
