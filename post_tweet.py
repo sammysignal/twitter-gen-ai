@@ -30,6 +30,9 @@ def cannotTweet():
 
 # Post a tweet then
 def postTweetLoop(override=False):
+    # Sleep to allow ChromeDriver ports to set up or smtg....
+    time.sleep(20)
+    
     if cannotTweet() and not override:
         return(0)
 
@@ -39,7 +42,7 @@ def postTweetLoop(override=False):
             p_logger.info("######################")
             p_logger.info("Attempting to tweet...")
             tweetBody = getTweet()
-            pj = TwitterDriver(U, P)
+            pj = TwitterDriver(U, P, headless=True)
             pj.login()
             pj.post_tweet(tweetBody)
             p_logger.info("Tweeted: " + tweetBody)
@@ -50,7 +53,7 @@ def postTweetLoop(override=False):
             p_logger.error(e)
             p_logger.error(traceback.format_exc())
             pj.quit()
-            return 1
+            return 0
         p_logger.info("Sleeping...")
         
         # With smart plug, simply exit.
@@ -61,5 +64,5 @@ def postTweetLoop(override=False):
 
 
 if __name__ == "__main__":
-    exit(postTweetLoop(override=True))
+    exit(postTweetLoop(override=False))
     

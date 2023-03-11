@@ -10,13 +10,21 @@ from selenium import common
 #    driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
 
 # driver for raspberry pi
-HEADLESS = False
 
 class GetDriver:
-    def getDriver():
-        if HEADLESS:
-            from pyvirtualdisplay import Display
-            display = Display(visible=0, size=(1500, 1100))
-            display.start()
-        driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
+    def getDriver(headless):
+#         if HEADLESS:
+#             from pyvirtualdisplay import Display
+#             display = Display(visible=0, size=(1500, 1100))
+#             display.start()
+
+        driver = None
+        if headless:
+            options = webdriver.ChromeOptions();
+            options.addArguments('--headless')
+            driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', options=options)
+        else:
+            driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver')
+
+
         return driver

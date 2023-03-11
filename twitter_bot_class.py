@@ -47,12 +47,12 @@ class TwitterDriver:
         loops over number of cycles provided, scrolls the page down and likes the available tweets on the page in each loop pass
     """
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, headless=True):
         #options = webdriver.ChromeOptions()
         #options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
         #chrome_driver_binary = "/Users/sammymehra/Downloads/chromedriver_mac64/chromedriver-new"
         #driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
-        driver = GetDriver.getDriver()
+        driver = GetDriver.getDriver(headless)
         # Wait 10 seconds for any find to succeed, or fail
         driver.implicitly_wait(10)
 
