@@ -1,6 +1,7 @@
 # Project-specific, should be created locally
 pw.py
 cookies.pkl
+last_tweet.pkl
 requests.sh
 pierre.log
 
