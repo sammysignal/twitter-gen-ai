@@ -1,0 +1,14 @@
+{
+  "name": "twitter-character-node",
+  "version": "1.0.0",
+  "description": "AI Portion of pierre bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sameer Mehra",
+  "license": "ISC",
+  "dependencies": {
+    "node_characterai": "^1.1.0"
+  }
+}
