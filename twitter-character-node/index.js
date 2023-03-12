@@ -3,49 +3,11 @@ const CharacterAI = require("node_characterai");
 // Requiring fs module in which writeFile function is defined.
 const fs = require("fs");
 
-// n=0 means return full response.
-// n>0 means return up to n sentences.
-PROMPTS = [
-  {
-    prompt: "What are you doing?",
-    n: 0,
-  },
-  {
-    prompt: "Where did you go?",
-    n: 0,
-  },
-  {
-    prompt: "You say the strangest things.",
-    n: 0,
-  },
-  {
-    prompt: "What's on your mind?",
-    n: 2,
-  },
-  {
-    prompt: "What happens in France?",
-    n: 2,
-  },
-  {
-    prompt: "You are very cool!",
-    n: 2,
-  },
-  {
-    prompt: "Do you have any fun date ideas?",
-    n: 1,
-  },
-  {
-    prompt: "Do you have any fun date ideas?",
-    n: 1,
-  },
-];
-
 function randomListSelection(l) {
   if (l.length === 0) {
     return "";
   }
-  // return l[Math.floor(Math.random() * l.length)];
-  return l[3];
+  return l[Math.floor(Math.random() * l.length)];
 }
 
 /**
@@ -115,23 +77,63 @@ function chooseRandomSentences(t, n) {
 
 /**
  * Gets a random prompt from the list of prompts to pass to pierre.
- * @returns String
+ * Within a prompt:
+ * // n=0 means return full response.
+ * // n>0 means return up to n sentences.
+ * @returns Prompt instance with prompt and n values.
  */
-function getPrompt() {
-  const p = randomListSelection(PROMPTS);
+async function getPrompt() {
+  // try three times
+  let prompts = null;
+  for (let i = 0; i < 3; i++) {
+    try {
+      let promptsResponse = await fetch("http://sameermehra.com/assets/api/pierre-prompts.json");
+      prompts = await promptsResponse.json();
+      break;
+    } catch (e) {
+      if (!(e instanceof TypeError)) {
+        throw e;
+      }
+      console.log("Connection error, trying again...");
+    }
+  }
+  const p = randomListSelection(prompts.prompts);
   console.log(p);
   return p;
 }
 
 function writeToOutputFile(output) {
   // Data which will write in a file.
-  let data = { tweet: output };
+  let data = {};
+  if (output) {
+    data = { tweet: output };
+  }
 
   // Write output. Since we are calling from parent directory, we include directory in path
   fs.writeFile("twitter-character-node/tweet_copy.json", JSON.stringify(data), (err) => {
     // In case of a error throw err.
     if (err) throw err;
   });
+}
+
+function charLimit(t) {
+  if (t.length <= 280) {
+    return t;
+  }
+  return "";
+}
+
+/**
+ * Filters the tweet, setting a character limit
+ * @param {String} t - Tweet copy
+ * @param {Object} p - prompt that resulted in the copy
+ */
+function filterTweet(t, p) {
+  console.log(t);
+  const t1 = removeActions(t);
+  const t2 = chooseRandomSentences(t1, p.n);
+  const t3 = charLimit(t2);
+  return t3;
 }
 
 const characterAI = new CharacterAI();
@@ -143,21 +145,32 @@ async function talkToPierre() {
   const pierreId = "lDUsZaTzDTCFq9oj2dovbQwFE5gx0Yb2zYYuXO4UAbY";
   // Discord moderator
   const discordMod = "8_1NyR8w1dOXmI1uWaieQcd147hecbdIK7CeEAIrdJw";
+
   const chat = await characterAI.createOrContinueChat(pierreId);
+  const prompt = await getPrompt();
 
-  const prompt = getPrompt();
+  let output = "";
+  for (let i = 0; i < 3; i++) {
+    const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
 
-  const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
+    console.log("Full Response:\n");
+    console.log(response);
 
-  console.log("Full Response:\n");
-  console.log(response);
+    console.log("Selected Response:\n");
+    output = filterTweet(response.text, prompt);
+    console.log(output);
 
-  console.log("Selected Response:\n");
-  console.log(chooseRandomSentences(removeActions(response.text), prompt.n));
+    if (output) {
+      break;
+    }
 
-  //writeToOutputFile(removeActions(response.text));
+    console.log("Did not pass filtration steps, retrying...");
+  }
+
+  writeToOutputFile(output);
 }
 
+// Main
 (async () => {
   talkToPierre();
 })();
