@@ -1,9 +1,7 @@
-import os, base64, time, traceback, pickle
-
-from datetime import datetime
-
+import time, traceback, pickle
 from twitter_bot_class import TwitterDriver
 from pierre_logger import p_logger
+from get_tweet import TweetGetter
 from pw import U, P
 
 # 6 hours
@@ -12,9 +10,6 @@ SLEEP_TIME = 21600
 # Options
 HEADLESS = True
 OVERRIDE = False
-
-def getTweet():
-    return "test"
 
 def cannotTweet():
     # First we make sure that it has been at least 5.5 hours since our last tweet
@@ -36,7 +31,7 @@ def cannotTweet():
 def postTweetLoop(override=False, headless=True):
     # Sleep to allow ChromeDriver ports to set up or smtg....
     time.sleep(20)
-    
+
     if cannotTweet() and not override:
         return(0)
 
@@ -45,7 +40,7 @@ def postTweetLoop(override=False, headless=True):
         try:
             p_logger.info("######################")
             p_logger.info("Attempting to tweet...")
-            tweetBody = getTweet()
+            tweetBody = TweetGetter.getTweet()
             pj = TwitterDriver(U, P, headless=headless)
             pj.login()
             pj.post_tweet(tweetBody)
@@ -59,14 +54,15 @@ def postTweetLoop(override=False, headless=True):
             pj.quit()
             return 0
         p_logger.info("Sleeping...")
-        
+
         # With smart plug, simply exit.
         return 0
-        
+
         # Without smart plug, sleep for 6 hours
         # time.sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":
-    exit(postTweetLoop(override=OVERRIDE, headless=HEADLESS))
-    
+    # exit(postTweetLoop(override=OVERRIDE, headless=HEADLESS))
+    print("hello")
+    print(TweetGetter.getTweet())

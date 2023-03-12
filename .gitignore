@@ -4,6 +4,7 @@ cookies.pkl
 last_tweet.pkl
 requests.sh
 pierre.log
+twitter-character-node/tweet_copy.json
 
 # node
 
