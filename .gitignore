@@ -10,7 +10,6 @@ twitter-character-node/tweet_copy.json
 
 node_modules/
 logs
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -75,7 +74,6 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal

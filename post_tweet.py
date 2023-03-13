@@ -63,6 +63,4 @@ def postTweetLoop(override=False, headless=True):
 
 
 if __name__ == "__main__":
-    # exit(postTweetLoop(override=OVERRIDE, headless=HEADLESS))
-    print("hello")
-    print(TweetGetter.getTweet())
+    exit(postTweetLoop(override=OVERRIDE, headless=HEADLESS))

@@ -2,6 +2,24 @@ const CharacterAI = require("node_characterai");
 
 // Requiring fs module in which writeFile function is defined.
 const fs = require("fs");
+var util = require("util");
+
+var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
+var log_stdout = process.stdout;
+
+var logger = function (d) {
+  log_file.write(util.format(d) + "\n");
+  log_stdout.write(util.format(d) + "\n");
+};
+
+/**
+ * Sleep so as to prevent rate limiting on character ai.
+ * Sleep formula is s*(2^i) where s is some base amount of time in ms, 10 seconds to start.
+ * @param {*} i - sleep iteration.
+ */
+async function sleep(i) {
+  await new Promise((r) => setTimeout(r, 1000 * 2 ** i));
+}
 
 function randomListSelection(l) {
   if (l.length === 0) {
@@ -94,11 +112,11 @@ async function getPrompt() {
       if (!(e instanceof TypeError)) {
         throw e;
       }
-      console.log("Connection error, trying again...");
+      logger("Connection error, trying again...");
     }
   }
   const p = randomListSelection(prompts.prompts);
-  console.log(p);
+  logger(p);
   return p;
 }
 
@@ -117,7 +135,8 @@ function writeToOutputFile(output) {
 }
 
 function charLimit(t) {
-  if (t.length <= 280) {
+  // Twitter limit is 280, but prefer shorter tweets from Pierre.
+  if (t.length <= 200) {
     return t;
   }
   return "";
@@ -129,7 +148,6 @@ function charLimit(t) {
  * @param {Object} p - prompt that resulted in the copy
  */
 function filterTweet(t, p) {
-  console.log(t);
   const t1 = removeActions(t);
   const t2 = chooseRandomSentences(t1, p.n);
   const t3 = charLimit(t2);
@@ -150,21 +168,25 @@ async function talkToPierre() {
   const prompt = await getPrompt();
 
   let output = "";
-  for (let i = 0; i < 3; i++) {
-    const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
+  for (let i = 0; i < 5; i++) {
+    // get response
+    // const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
+    const response = { text: "blah!" };
 
-    console.log("Full Response:\n");
-    console.log(response);
-
-    console.log("Selected Response:\n");
+    logger("Full Response:\n");
+    logger(response);
+    logger("\n");
+    logger("Selected Response:\n");
     output = filterTweet(response.text, prompt);
-    console.log(output);
+    logger(output);
 
     if (output) {
       break;
     }
 
-    console.log("Did not pass filtration steps, retrying...");
+    logger("Did not pass filtration steps, retrying...");
+
+    sleep(i);
   }
 
   writeToOutputFile(output);

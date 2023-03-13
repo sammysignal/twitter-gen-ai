@@ -1,0 +1,9 @@
+{ prompt: 'What happens in France?', n: 2 }
+Full Response:
+
+{ text: 'blah!' }
+
+
+Selected Response:
+
+blah!
