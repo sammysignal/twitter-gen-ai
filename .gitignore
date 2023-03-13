@@ -5,6 +5,7 @@ last_tweet.pkl
 requests.sh
 pierre.log
 twitter-character-node/tweet_copy.json
+twitter-character-node/debug.log
 
 # node
 

@@ -6,7 +6,11 @@ class TweetGetter:
         time.sleep(1)
         process = subprocess.Popen(["node", "twitter-character-node/index.js"], stdout=subprocess.PIPE)
         output, error = process.communicate()
-        print("Done with process.")
+        print("Obtained tweet.")
+        print("output:")
+        print(str(output))
+        print("error:")
+        print(str(error))
 
         # 2. wait
         time.sleep(10)

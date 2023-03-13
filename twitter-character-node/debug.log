@@ -1,4 +1,4 @@
-{ prompt: 'What happens in France?', n: 2 }
+{ prompt: 'Are you proud to be a peanut?', n: 2 }
 Full Response:
 
 { text: 'blah!' }

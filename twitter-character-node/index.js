@@ -170,8 +170,7 @@ async function talkToPierre() {
   let output = "";
   for (let i = 0; i < 5; i++) {
     // get response
-    // const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
-    const response = { text: "blah!" };
+    const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
 
     logger("Full Response:\n");
     logger(response);
