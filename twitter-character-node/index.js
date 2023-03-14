@@ -1,8 +1,14 @@
+//import fetch from "node-fetch";
+//var fetch = require('cross-fetch');
+
 const CharacterAI = require("node_characterai");
 
 // Requiring fs module in which writeFile function is defined.
 const fs = require("fs");
 var util = require("util");
+
+// false indicates app is live!
+var TESTING = true;
 
 var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
 var log_stdout = process.stdout;
@@ -107,7 +113,10 @@ async function getPrompt() {
     try {
       let promptsResponse = await fetch("http://sameermehra.com/assets/api/pierre-prompts.json");
       prompts = await promptsResponse.json();
-      break;
+      if (prompts) {
+        logger("Got prompts.");
+        break;
+      }
     } catch (e) {
       if (!(e instanceof TypeError)) {
         throw e;
@@ -125,6 +134,8 @@ function writeToOutputFile(output) {
   let data = {};
   if (output) {
     data = { tweet: output };
+  } else {
+    logger("Output was not captured!");
   }
 
   // Write output. Since we are calling from parent directory, we include directory in path
@@ -157,7 +168,13 @@ function filterTweet(t, p) {
 const characterAI = new CharacterAI();
 
 async function talkToPierre() {
-  await characterAI.authenticateAsGuest();
+  if (fetch) {
+    await characterAI.authenticateAsGuest();
+  } else {
+    logger('fetch is not defined!!!!');
+    return;
+  }
+  
 
   // Pierre the Peanut
   const pierreId = "lDUsZaTzDTCFq9oj2dovbQwFE5gx0Yb2zYYuXO4UAbY";
@@ -170,7 +187,10 @@ async function talkToPierre() {
   let output = "";
   for (let i = 0; i < 5; i++) {
     // get response
-    const response = await chat.sendAndAwaitResponse(prompt.prompt, true);
+    let response = { 'text': 'This is a test tweet! The time is ' + new Date().toLocaleTimeString() };
+    if (!TESTING) {
+      response = await chat.sendAndAwaitResponse(prompt.prompt, true);
+    }
 
     logger("Full Response:\n");
     logger(response);
@@ -193,5 +213,11 @@ async function talkToPierre() {
 
 // Main
 (async () => {
-  talkToPierre();
+  try {
+    await talkToPierre();
+  } catch (err) {
+    log_file.end();
+    throw err;
+  }
+
 })();

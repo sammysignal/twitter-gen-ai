@@ -7,9 +7,8 @@ from pw import U, P
 # 6 hours
 SLEEP_TIME = 21600
 
-# Options
-HEADLESS = True
-OVERRIDE = False
+# False indicates production state
+TESTING = True
 
 def cannotTweet():
     # First we make sure that it has been at least 5.5 hours since our last tweet
@@ -28,23 +27,25 @@ def cannotTweet():
     return False
 
 # Post a tweet then
-def postTweetLoop(override=False, headless=True):
+def postTweetLoop(testing):
     # Sleep to allow ChromeDriver ports to set up or smtg....
-    time.sleep(20)
+    p_logger.info("Executing post_tweet script")
+    
+    time.sleep(60)
 
-    if cannotTweet() and not override:
-        return(0)
+    if not testing:
+        if cannotTweet():
+            return(0)
 
     pj = None
     while True:
         try:
-            p_logger.info("######################")
-            p_logger.info("Attempting to tweet...")
+            p_logger.info("Attempting to tweet! Obtaining tweet...")
             tweetBody = TweetGetter.getTweet()
-            pj = TwitterDriver(U, P, headless=headless)
+            p_logger.info("Obtained tweet: " + tweetBody)
+            pj = TwitterDriver(U, P, testing)
             pj.login()
             pj.post_tweet(tweetBody)
-            p_logger.info("Tweeted: " + tweetBody)
             pj.quit()
             with open("last_tweet.pkl","wb") as f:
                 pickle.dump(time.time(), f)
@@ -53,14 +54,17 @@ def postTweetLoop(override=False, headless=True):
             p_logger.error(traceback.format_exc())
             pj.quit()
             return 0
-        p_logger.info("Sleeping...")
 
         # With smart plug, simply exit.
         return 0
 
         # Without smart plug, sleep for 6 hours
+        # p_logger.info("Sleeping...")
         # time.sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":
-    exit(postTweetLoop(override=OVERRIDE, headless=HEADLESS))
+    p_logger.info("######################")
+    code = postTweetLoop(testing=TESTING)
+    p_logger.info("exiting.")
+    exit(code)

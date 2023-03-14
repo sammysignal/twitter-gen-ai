@@ -1,9 +1,0 @@
-{ prompt: 'Are you proud to be a peanut?', n: 2 }
-Full Response:
-
-{ text: 'blah!' }
-
-
-Selected Response:
-
-blah!

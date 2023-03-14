@@ -47,12 +47,12 @@ class TwitterDriver:
         loops over number of cycles provided, scrolls the page down and likes the available tweets on the page in each loop pass
     """
 
-    def __init__(self, email, password, headless=True):
+    def __init__(self, email, password, testing):
         #options = webdriver.ChromeOptions()
         #options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
         #chrome_driver_binary = "/Users/sammymehra/Downloads/chromedriver_mac64/chromedriver-new"
         #driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
-        driver = GetDriver.getDriver(headless)
+        driver = GetDriver.getDriver(headless=(not testing))
         # Wait 10 seconds for any find to succeed, or fail
         driver.implicitly_wait(10)
 
@@ -60,6 +60,7 @@ class TwitterDriver:
         self.password = password
         self.driver = driver
         self.is_logged_in = False
+        self.testing = testing
 
     # Logs in and redirects to homepage
     def login(self):
@@ -161,7 +162,8 @@ class TwitterDriver:
         time.sleep(4)
         driver.find_element(By.CLASS_NAME, "notranslate").send_keys(Keys.ENTER)
         time.sleep(4)
-        # driver.find_element(By.XPATH,"//div[@data-testid='tweetButton']").click()
+        if (not self.testing):
+            driver.find_element(By.XPATH,"//div[@data-testid='tweetButton']").click()
         p_logger.info("Tweeted!")
         time.sleep(10)
 
