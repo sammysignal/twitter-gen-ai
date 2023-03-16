@@ -2,13 +2,14 @@
 //var fetch = require('cross-fetch');
 
 const CharacterAI = require("node_characterai");
+const characterAI = new CharacterAI();
 
 // Requiring fs module in which writeFile function is defined.
 const fs = require("fs");
 var util = require("util");
 
 // false indicates app is live!
-var TESTING = true;
+var TESTING = false;
 
 var log_file = fs.createWriteStream(__dirname + "/debug.log", { flags: "w" });
 var log_stdout = process.stdout;
@@ -165,13 +166,14 @@ function filterTweet(t, p) {
   return t3;
 }
 
-const characterAI = new CharacterAI();
 
 async function talkToPierre() {
   if (fetch) {
-    await characterAI.authenticateAsGuest();
+    // await characterAI.authenticateAsGuest();
+    await characterAI.authenticateWithToken("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkVqYmxXUlVCWERJX0dDOTJCa2N1YyJ9.eyJpc3MiOiJodHRwczovL2NoYXJhY3Rlci1haS51cy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTMxNDYxNzU0OTc1MDQzOTc3MzgiLCJhdWQiOlsiaHR0cHM6Ly9hdXRoMC5jaGFyYWN0ZXIuYWkvIiwiaHR0cHM6Ly9jaGFyYWN0ZXItYWkudXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3ODQxNTAxNiwiZXhwIjoxNjgxMDA3MDE2LCJhenAiOiJkeUQzZ0UyODFNcWdJU0c3RnVJWFloTDJXRWtucVp6diIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.YZxhFx2c5e-D9CuNVC8QirNjjC3vhWbr-D-YzZAYgVtoaSaqa94VBPAMuxo9iCXhLvxjKWtFh8uqHgslMBenfjq-dgUGzVhiX9TEY7F7Sqkc8qBiaA4BJ8hT8md6iZAAde2ofSGxPJcjSUb6BWVmhtpSWbuPsA73USpEfc9qvJw6Yw_LfWuZzmAG3jl2fyjKuMQ6n1j3kV30vP5F7DQQKWzOfjm4QRaMIohGYyvSSLC9C_pX-Bu4LEpXw_2qFRDKqW4-p4grBknBqQ2TK65_XGT2BB31C-BQD_iBsvPQAZNRXi2BPUg43mcRELXxuXfxRoAzcDOYVHBNjxXle196KA");
   } else {
     logger('fetch is not defined!!!!');
+    console.log('fetch is not defineeeeeed');
     return;
   }
   
@@ -214,10 +216,14 @@ async function talkToPierre() {
 // Main
 (async () => {
   try {
+    logger('Executing with node version: ' + process.version);
     await talkToPierre();
   } catch (err) {
+    logger(err);
+    console.log(err);
     log_file.end();
     throw err;
   }
+  log_file.end();
 
 })();

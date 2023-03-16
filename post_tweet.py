@@ -28,8 +28,10 @@ def cannotTweet():
 
 # Post a tweet then
 def postTweetLoop(testing):
+    mode = "TEST" if TESTING else "LIVE"
+    
     # Sleep to allow ChromeDriver ports to set up or smtg....
-    p_logger.info("Executing post_tweet script")
+    p_logger.info("Executing post_tweet script mode = " + mode)
     
     time.sleep(60)
 

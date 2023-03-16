@@ -4,7 +4,7 @@ class TweetGetter:
     def getTweet():
         # 1. Initiate node process
         time.sleep(1)
-        process = subprocess.Popen(["node", "twitter-character-node/index.js"], stdout=subprocess.PIPE)
+        process = subprocess.Popen(["node", "twitter-character-node/index.js"], stdout=subprocess.PIPE, shell=True)
         output, error = process.communicate()
         print("Obtained tweet.")
         print("output:")
