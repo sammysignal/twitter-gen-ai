@@ -7,6 +7,7 @@ const characterAI = new CharacterAI();
 // Requiring fs module in which writeFile function is defined.
 const fs = require("fs");
 var util = require("util");
+const Chat = require("node_characterai/chat");
 
 // false indicates app is live!
 var TESTING = false;
@@ -166,30 +167,31 @@ function filterTweet(t, p) {
   return t3;
 }
 
-
 async function talkToPierre() {
   if (fetch) {
     // await characterAI.authenticateAsGuest();
-    await characterAI.authenticateWithToken("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkVqYmxXUlVCWERJX0dDOTJCa2N1YyJ9.eyJpc3MiOiJodHRwczovL2NoYXJhY3Rlci1haS51cy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTMxNDYxNzU0OTc1MDQzOTc3MzgiLCJhdWQiOlsiaHR0cHM6Ly9hdXRoMC5jaGFyYWN0ZXIuYWkvIiwiaHR0cHM6Ly9jaGFyYWN0ZXItYWkudXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3ODQxNTAxNiwiZXhwIjoxNjgxMDA3MDE2LCJhenAiOiJkeUQzZ0UyODFNcWdJU0c3RnVJWFloTDJXRWtucVp6diIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.YZxhFx2c5e-D9CuNVC8QirNjjC3vhWbr-D-YzZAYgVtoaSaqa94VBPAMuxo9iCXhLvxjKWtFh8uqHgslMBenfjq-dgUGzVhiX9TEY7F7Sqkc8qBiaA4BJ8hT8md6iZAAde2ofSGxPJcjSUb6BWVmhtpSWbuPsA73USpEfc9qvJw6Yw_LfWuZzmAG3jl2fyjKuMQ6n1j3kV30vP5F7DQQKWzOfjm4QRaMIohGYyvSSLC9C_pX-Bu4LEpXw_2qFRDKqW4-p4grBknBqQ2TK65_XGT2BB31C-BQD_iBsvPQAZNRXi2BPUg43mcRELXxuXfxRoAzcDOYVHBNjxXle196KA");
+    await characterAI.authenticateWithToken(
+      "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkVqYmxXUlVCWERJX0dDOTJCa2N1YyJ9.eyJpc3MiOiJodHRwczovL2NoYXJhY3Rlci1haS51cy5hdXRoMC5jb20vIiwic3ViIjoiZ29vZ2xlLW9hdXRoMnwxMTMxNDYxNzU0OTc1MDQzOTc3MzgiLCJhdWQiOlsiaHR0cHM6Ly9hdXRoMC5jaGFyYWN0ZXIuYWkvIiwiaHR0cHM6Ly9jaGFyYWN0ZXItYWkudXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3ODQxNTAxNiwiZXhwIjoxNjgxMDA3MDE2LCJhenAiOiJkeUQzZ0UyODFNcWdJU0c3RnVJWFloTDJXRWtucVp6diIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.YZxhFx2c5e-D9CuNVC8QirNjjC3vhWbr-D-YzZAYgVtoaSaqa94VBPAMuxo9iCXhLvxjKWtFh8uqHgslMBenfjq-dgUGzVhiX9TEY7F7Sqkc8qBiaA4BJ8hT8md6iZAAde2ofSGxPJcjSUb6BWVmhtpSWbuPsA73USpEfc9qvJw6Yw_LfWuZzmAG3jl2fyjKuMQ6n1j3kV30vP5F7DQQKWzOfjm4QRaMIohGYyvSSLC9C_pX-Bu4LEpXw_2qFRDKqW4-p4grBknBqQ2TK65_XGT2BB31C-BQD_iBsvPQAZNRXi2BPUg43mcRELXxuXfxRoAzcDOYVHBNjxXle196KA"
+    );
   } else {
-    logger('fetch is not defined!!!!');
-    console.log('fetch is not defineeeeeed');
+    logger("fetch is not defined!!!!");
+    console.log("fetch is not defineeeeeed");
     return;
   }
-  
 
   // Pierre the Peanut
   const pierreId = "lDUsZaTzDTCFq9oj2dovbQwFE5gx0Yb2zYYuXO4UAbY";
   // Discord moderator
   const discordMod = "8_1NyR8w1dOXmI1uWaieQcd147hecbdIK7CeEAIrdJw";
 
-  const chat = await characterAI.createOrContinueChat(pierreId);
+  // const chat = await characterAI.createOrContinueChat(pierreId);
+  const chat = new Chat(characterAI, pierreId, null);
   const prompt = await getPrompt();
 
   let output = "";
   for (let i = 0; i < 5; i++) {
     // get response
-    let response = { 'text': 'This is a test tweet! The time is ' + new Date().toLocaleTimeString() };
+    let response = { text: "This is a test tweet! The time is " + new Date().toLocaleTimeString() };
     if (!TESTING) {
       response = await chat.sendAndAwaitResponse(prompt.prompt, true);
     }
@@ -216,7 +218,7 @@ async function talkToPierre() {
 // Main
 (async () => {
   try {
-    logger('Executing with node version: ' + process.version);
+    logger("Executing with node version: " + process.version);
     await talkToPierre();
   } catch (err) {
     logger(err);
@@ -225,5 +227,4 @@ async function talkToPierre() {
     throw err;
   }
   log_file.end();
-
 })();

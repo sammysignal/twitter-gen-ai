@@ -1,2 +1,6 @@
 Executing with node version: v19.7.0
-Got prompts.
+TypeError: Cannot read properties of null (reading 'external_id')
+    at new Chat (/Users/sammymehra/Documents/Code-Local/twitter-gen-ai/twitter-character-node/node_modules/node_characterai/chat.js:6:40)
+    at talkToPierre (/Users/sammymehra/Documents/Code-Local/twitter-gen-ai/twitter-character-node/index.js:188:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async /Users/sammymehra/Documents/Code-Local/twitter-gen-ai/twitter-character-node/index.js:222:5

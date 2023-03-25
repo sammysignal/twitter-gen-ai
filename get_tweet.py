@@ -1,10 +1,16 @@
-import json, time, subprocess
+import json
+import time
+import subprocess
+
+# Uses the character AI JS api to gather a tweet.
+
 
 class TweetGetter:
     def getTweet():
         # 1. Initiate node process
         time.sleep(1)
-        process = subprocess.Popen(["node", "twitter-character-node/index.js"], stdout=subprocess.PIPE, shell=True)
+        process = subprocess.Popen(
+            ["node", "twitter-character-node/index.js"], stdout=subprocess.PIPE, shell=True)
         output, error = process.communicate()
         print("Obtained tweet.")
         print("output:")
