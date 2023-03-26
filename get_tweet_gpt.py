@@ -45,12 +45,12 @@ def get_prompt():
             )
             prompts = prompts_response.json()
             if prompts:
-                print("Got prompts.")
+                p_logger.info("Got prompts.")
                 prompt = randomListSelection(prompts["prompts"])["prompt"]
                 break
         except TypeError:
-            p_logger("Connection error, trying again...")
-    print(prompt)
+            p_logger.info("Connection error, trying again...")
+    p_logger.info(prompt)
     return prompt
 
 
@@ -120,7 +120,7 @@ def tweetIsTooDepressing(t):
     sentiment_polarity = blob.sentiment.polarity
 
     # Print the sentiment polarity
-    print(sentiment_polarity)
+    p_logger.info("Sentiment: " + str(sentiment_polarity))
 
     if sentiment_polarity < -0.5:
         p_logger.error("Tweet is too depressing!")
@@ -160,6 +160,8 @@ class TweetGetterGPT:
         # Get prompt:
         prompt = get_prompt() + " ->"
 
+        p_logger.info("prompt: " + prompt)
+
         # Set the parameters for the OpenAI API request
         params = {
             # v3
@@ -187,26 +189,23 @@ class TweetGetterGPT:
 
         tweet = None
         for i in range(5):
-            print("prompt: " + prompt)
-
             # Call the OpenAI API to generate the tweet
-            print("Making a request...")
+            p_logger.info("Making a request...")
             response = openai.Completion.create(**params)
 
             # Read the output
             tweet = response.choices[0].text.strip()
 
-            print("Unfiltered Tweet: " + tweet)
+            p_logger.info("Unfiltered Tweet: " + tweet)
 
             # Apply limit filtration
             filteredTweet = filterTweet(tweet)
 
-            print("Filtered Tweet: " + filteredTweet)
+            p_logger.info("Filtered Tweet: " + filteredTweet)
 
             # Apply moderation
             if moderateTweet(filteredTweet, past_tweets):
                 p_logger.error("Tweet was moderated.")
-                print("Tweet was already tweeted, or it was moderated.")
                 continue
 
             if i == 4:
@@ -220,49 +219,25 @@ class TweetGetterGPT:
             if not testing:
                 pickle.dump(past_tweets + [tweet], f)
 
-        print("final tweet: " + tweet)
+        p_logger.info("final tweet: " + tweet)
 
         # Return the generated tweet
         return tweet
-
-
-# def test():
-#     assert (
-#         getSentencesBeforeLimit(
-#             "This is a testThis isThis is a testThis is a testThis is a testThis is a testThis is a \
-#                 test a testThis is a testThis is a testThis is a testThis is a testThis is a This \
-#                     is a testThis is a testThis is a testThis is a testThis is a testThis is a \
-#                         testtestThis is a testThis is a testThis is a testThis is a testThis is a \
-#                             testThis is a test"
-#         )
-#         == ""
-#     )
-#     assert getSentencesBeforeLimit("This is a test. ") == "This is a test. "
-
-#     assert (
-#         getSentencesBeforeLimit(
-#             "Lorem Ipsum is simply dummy text of the printing and typesetting industry. \
-#                 Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, \
-#                     when an unknown printer took a galley of type and scrambled it to make a type \
-#                         specimen book. It has survived not only five centuries, but also the leap \
-#                             into electronic typesetting, remaining essentially unchanged."
-#         )
-#         == "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
-#     )
 
 
 if __name__ == "__main__":
     # test()
 
     # get a tweet
-    TweetGetterGPT.getTweet(True)
+    t = TweetGetterGPT.getTweet(True)
+
+    print(t)
 
     ## get 20 tweets
     # tweets = []
     # for i in range(20):
     #     tweets.append(TweetGetterGPT.getTweet(True))
     # for j in tweets:
-    #     print(j)
+    #     p_logger.info(j)
 
-    print("exiting.")
     exit(0)
