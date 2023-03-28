@@ -2,6 +2,9 @@ import time
 import traceback
 import pickle
 import requests
+
+from filelock import Timeout, FileLock
+
 from twitter_bot_class import TwitterDriver
 from pierre_logger import p_logger
 from get_tweet_gpt import TweetGetterGPT
@@ -57,8 +60,6 @@ def postTweetLoop(testing, openaiOptions):
     # Sleep to allow ChromeDriver ports to set up or smtg....
     p_logger.info("Executing post_tweet script mode = " + mode)
 
-    time.sleep(60)
-
     if not testing:
         if cannotTweet():
             return 0
@@ -91,10 +92,18 @@ def postTweetLoop(testing, openaiOptions):
 
 
 if __name__ == "__main__":
-    p_logger.info("################################")
-    options = getOptions()
-    testing = options["testing"]
-    openaiOptions = options["openaiCompletionParams"]
-    code = postTweetLoop(testing=testing, openaiOptions=openaiOptions)
-    p_logger.info("exiting.")
-    exit(code)
+    lock = FileLock("lock.lock", timeout=1)
+    try:
+        with lock:
+            p_logger.info("################################")
+            time.sleep(60)
+            options = getOptions()
+            testing = options["testing"]
+            openaiOptions = options["openaiCompletionParams"]
+            code = postTweetLoop(testing=testing, openaiOptions=openaiOptions)
+            p_logger.info("exiting.")
+            exit(code)
+    except TimeoutError as e:
+        print("Process is already running.")
+        exit(0)
+    

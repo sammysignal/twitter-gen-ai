@@ -165,7 +165,7 @@ class TwitterDriver:
         if (not self.testing):
             driver.find_element(By.XPATH,"//div[@data-testid='tweetButton']").click()
         p_logger.info("Tweeted!")
-        time.sleep(10)
+        time.sleep(3)
 
     def quit(self):
         return self.driver.quit()
