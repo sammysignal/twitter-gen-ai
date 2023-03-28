@@ -13,8 +13,8 @@ from pw import U, P
 # MAIN
 # This is the main file that gets kicked off to send a tweet from PierreThePeanut account.
 
-# 18 hours
-SLEEP_TIME = 64800
+# 22 hours
+SLEEP_TIME = 79200
 
 
 # Gathers options via api, especially wether or not in test mode.
