@@ -1,6 +1,7 @@
 import time
 import traceback
 import pickle
+import requests
 from twitter_bot_class import TwitterDriver
 from pierre_logger import p_logger
 from get_tweet_gpt import TweetGetterGPT
@@ -9,13 +10,25 @@ from pw import U, P
 # MAIN
 # This is the main file that gets kicked off to send a tweet from PierreThePeanut account.
 
-# 6 hours
-SLEEP_TIME = 21600
+# 18 hours
+SLEEP_TIME = 64800
 
-# False indicates production state
-TESTING = True
+# Gathers options via api, especially wether or not in test mode.
+def getOptions():
+    for i in range(3):
+        try:
+            options_response = requests.get(
+                "http://sameermehra.com/assets/api/options.json"
+            )
+            options = options_response.json()
+            if options:
+                p_logger.info("Got options.")
+                return options
+        except TypeError:
+            p_logger.info("Options - Connection error, trying again...")
+    return {"testing": True}
 
-
+# Returns true if we cannot tweet now, it has not been enough time.
 def cannotTweet():
     # First we make sure that it has been at least 5.5 hours since our last tweet
     last_tweet_time = 0
@@ -33,11 +46,9 @@ def cannotTweet():
         return True
     return False
 
-# Post a tweet then
-
-
-def postTweetLoop(testing):
-    mode = "TEST" if TESTING else "LIVE"
+# Post a tweet
+def postTweetLoop(testing, openaiOptions):
+    mode = "TEST" if testing else "LIVE"
 
     # Sleep to allow ChromeDriver ports to set up or smtg....
     p_logger.info("Executing post_tweet script mode = " + mode)
@@ -52,7 +63,7 @@ def postTweetLoop(testing):
     while True:
         try:
             p_logger.info("Attempting to tweet! Obtaining tweet...")
-            tweetBody = TweetGetterGPT.getTweet(testing)
+            tweetBody = TweetGetterGPT.getTweet(testing, openaiOptions)
             p_logger.info("Obtained tweet: " + tweetBody)
             pj = TwitterDriver(U, P, testing)
             pj.login()
@@ -75,7 +86,10 @@ def postTweetLoop(testing):
 
 
 if __name__ == "__main__":
-    p_logger.info("######################")
-    code = postTweetLoop(testing=TESTING)
+    p_logger.info("################################")
+    options = getOptions()
+    testing = options["testing"]
+    openaiOptions = options["openaiCompletionParams"]
+    code = postTweetLoop(testing=testing, openaiOptions=openaiOptions)
     p_logger.info("exiting.")
     exit(code)

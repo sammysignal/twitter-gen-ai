@@ -9,6 +9,7 @@ class GetDriver:
         # For now always use headless, since no issues with twitter part
         options = webdriver.ChromeOptions()
         # options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
         driver = webdriver.Chrome('/usr/lib/chromium-browser/chromedriver', chrome_options=options)
 
         driver.implicitly_wait(10) # seconds

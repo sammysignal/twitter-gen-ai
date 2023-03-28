@@ -156,28 +156,15 @@ def moderateTweet(t, past_tweets):
 
 # Adapted from https://github.com/Prateek93a/selenium-twitter-bot
 class TweetGetterGPT:
-    def getTweet(testing):
+    def getTweet(testing, openaiOptions):
         # Get prompt:
         prompt = get_prompt() + " ->"
 
         p_logger.info("prompt: " + prompt)
 
-        # Set the parameters for the OpenAI API request
-        params = {
-            # v3
-            "model": "davinci:ft-personal-2023-03-21-04-04-59",
-            # v2
-            # 'model': 'davinci:ft-personal-2023-03-19-22-27-12',
-            # v1
-            # 'model': 'davinci:ft-personal-2023-03-19-03-28-50',
-            "prompt": prompt,
-            "temperature": 0.7,
-            # 'frequency_penalty': 0.5,
-            # 'presence_penalty': 0.5,
-            "max_tokens": 70,
-            "n": 1,
-            "stop": "\n",
-        }
+        # Get options from request. Default options listed in __main__
+        params = copy.copy(openaiOptions)
+        params["prompt"] = prompt
 
         # Load past tweets
         past_tweets = []
@@ -226,10 +213,24 @@ class TweetGetterGPT:
 
 
 if __name__ == "__main__":
-    # test()
+    # Set the test parameters for the OpenAI API request
+    params = {
+        # v3
+        "model": "davinci:ft-personal-2023-03-21-04-04-59",
+        # v2
+        # 'model': 'davinci:ft-personal-2023-03-19-22-27-12',
+        # v1
+        # 'model': 'davinci:ft-personal-2023-03-19-03-28-50',
+        "prompt": "This is a test",
+        "temperature": 0.7,
+        # 'frequency_penalty': 0.5,
+        # 'presence_penalty': 0.5,
+        "max_tokens": 70,
+        "n": 1,
+        "stop": "\n",
+    }
 
-    # get a tweet
-    t = TweetGetterGPT.getTweet(True)
+    t = TweetGetterGPT.getTweet(True, params)
 
     print(t)
 
