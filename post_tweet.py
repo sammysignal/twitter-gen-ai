@@ -35,7 +35,7 @@ def getOptions():
 
 # Returns true if we cannot tweet now, it has not been enough time.
 def cannotTweet():
-    # First we make sure that it has been at least 5.5 hours since our last tweet
+    # First we make sure that it has been at least 22 hours since our last tweet
     last_tweet_time = 0
     try:
         with open("last_tweet.pkl", "rb") as f:
@@ -45,7 +45,7 @@ def cannotTweet():
         return True
 
     time_diff = time.time() - last_tweet_time
-    if time_diff < (SLEEP_TIME * 0.95):
+    if time_diff < (SLEEP_TIME):
         p_logger.error(
             "Cannot tweet now, it has only been " + str(time_diff / 60) + " mins."
         )
@@ -73,7 +73,8 @@ def postTweetLoop(testing, openaiOptions):
             pj = TwitterDriver(U, P, testing)
             pj.login()
             pj.post_tweet(tweetBody)
-            pj.quit()
+            if (pj.driver):
+                pj.quit()
             with open("last_tweet.pkl", "wb") as f:
                 pickle.dump(time.time(), f)
         except Exception as e:
