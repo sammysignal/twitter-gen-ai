@@ -47,7 +47,7 @@ def cannotTweet():
     time_diff = time.time() - last_tweet_time
     if time_diff < (SLEEP_TIME):
         p_logger.error(
-            "Cannot tweet now, it has only been " + str(time_diff / 60) + " mins."
+            "Cannot tweet now, it has only been " + str(time_diff / 3600) + " hrs."
         )
         return True
     return False
