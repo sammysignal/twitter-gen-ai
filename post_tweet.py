@@ -13,6 +13,7 @@ from pw import U, P
 # 18 hours
 SLEEP_TIME = 64800
 
+
 # Gathers options via api, especially wether or not in test mode.
 def getOptions():
     for i in range(3):
@@ -28,6 +29,7 @@ def getOptions():
             p_logger.info("Options - Connection error, trying again...")
     return {"testing": True}
 
+
 # Returns true if we cannot tweet now, it has not been enough time.
 def cannotTweet():
     # First we make sure that it has been at least 5.5 hours since our last tweet
@@ -41,10 +43,12 @@ def cannotTweet():
 
     time_diff = time.time() - last_tweet_time
     if time_diff < (SLEEP_TIME * 0.95):
-        p_logger.error("Cannot tweet now, it has only been " +
-                       str(time_diff / 60) + " mins.")
+        p_logger.error(
+            "Cannot tweet now, it has only been " + str(time_diff / 60) + " mins."
+        )
         return True
     return False
+
 
 # Post a tweet
 def postTweetLoop(testing, openaiOptions):
@@ -57,7 +61,7 @@ def postTweetLoop(testing, openaiOptions):
 
     if not testing:
         if cannotTweet():
-            return (0)
+            return 0
 
     pj = None
     while True:
@@ -74,7 +78,8 @@ def postTweetLoop(testing, openaiOptions):
         except Exception as e:
             p_logger.error(e)
             p_logger.error(traceback.format_exc())
-            pj.quit()
+            if pj:
+                pj.quit()
             return 0
 
         # With smart plug, simply exit.
