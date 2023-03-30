@@ -8,13 +8,40 @@ from filelock import Timeout, FileLock
 from twitter_bot_class import TwitterDriver
 from pierre_logger import p_logger
 from get_tweet_gpt import TweetGetterGPT
-from pw import U, P
+from pw import U, P, MAILGUN_EMAIL_API_KEY, MY_EMAIL, MAILGUN_DOMAIN
 
 # MAIN
 # This is the main file that gets kicked off to send a tweet from PierreThePeanut account.
 
 # 22 hours
 SLEEP_TIME = 79200
+
+
+# Email a digest to myself using mailgun.
+def emailDigest():
+    from datetime import date
+
+    p_logger.info("Sending email...")
+    body = p_logger.getLogBuffer()
+    today = str(date.today())
+
+    res = requests.post(
+        "https://api.mailgun.net/v3/" + MAILGUN_DOMAIN + "/messages",
+        auth=("api", MAILGUN_EMAIL_API_KEY),
+        data={
+            "from": "Pierre Digest <mailgun@" + MAILGUN_DOMAIN + ">",
+            "to": [MY_EMAIL],
+            "subject": "Pierre The Peanut Log Digest " + today,
+            "text": body,
+        },
+    )
+
+    if res.status_code != 200:
+        p_logger.error("Could not send email, response code: " + str(res.status_code))
+        p_logger.error(str(res.json()))
+        return
+
+    p_logger.info("Email digest sent!")
 
 
 # Gathers options via api, especially wether or not in test mode.
@@ -73,7 +100,7 @@ def postTweetLoop(testing, openaiOptions):
             pj = TwitterDriver(U, P, testing)
             pj.login()
             pj.post_tweet(tweetBody)
-            if (pj.driver):
+            if pj.driver:
                 pj.quit()
             with open("last_tweet.pkl", "wb") as f:
                 pickle.dump(time.time(), f)
@@ -82,9 +109,12 @@ def postTweetLoop(testing, openaiOptions):
             p_logger.error(traceback.format_exc())
             if pj:
                 pj.quit()
+
+            emailDigest()
             return 0
 
         # With smart plug, simply exit.
+        emailDigest()
         return 0
 
         # Without smart plug, sleep for 6 hours
@@ -107,4 +137,3 @@ if __name__ == "__main__":
     except TimeoutError as e:
         print("Process is already running.")
         exit(0)
-    
