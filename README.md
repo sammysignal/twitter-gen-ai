@@ -1,4 +1,4 @@
-# twitter-gen-ai
+# Say hi to Pierre!
 
 Pierre is a unique character of my own invention. He is the result of fine-tuning a gpt model to provide tweet-sized outputs in a unpredictable way while still being true to the character’s clever and comedic personality. He is programmed to tweet once per day with his (usually philosophical) musings. He is hosted on a raspberry pi and interfaces with the OpenAI API and chrome webdriver using python. Check him out: twitter.com/pierrethepeanut
 
